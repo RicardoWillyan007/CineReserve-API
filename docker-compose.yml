@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: cinema_api_web
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DJANGO_SECRET_KEY=django-insecure-chave-padrao
+      - DJANGO_DEBUG=True
+      - POSTGRES_DB=cinereserve
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - REDIS_URL=redis://redis:6379/1
+
+  db:
+    image: postgres:15-alpine
+    container_name: cinema_api_db
+    environment:
+      POSTGRES_DB: cinereserve
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: cinema_api_redis
+    ports:
+      - "6379:6379"
